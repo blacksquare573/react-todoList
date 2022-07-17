@@ -1,10 +1,10 @@
-import TodoItem from "../todo-item/todoItem.compontent";
+import TodoItem from "../todo-item/todoItem.component";
 import "./todo-list.styles.css";
 
-const TodoList = ({ items }) => (
+const TodoList = ({ items }, { remove }) => (
   <div className="todo-list">
-    {items.map((item) => {
-      return <TodoItem key={item.id} item={item}></TodoItem>;
+    {items.map((item, index) => {
+      return <TodoItem key={item.id} item={item} remove={remove} />;
     })}
   </div>
 );

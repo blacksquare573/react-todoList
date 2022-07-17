@@ -1,6 +1,6 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
-import TodoList from "./components/todo-list/todoList.component";
+import TodoItem from "./components/todo-item/todoItem.component";
 import "./App.css";
 
 const App = () => {
@@ -30,13 +30,38 @@ const App = () => {
     } else {
       const newTodoItem = {
         todoText: todoText,
-        time: month + "/" + day,
+        month: month,
+        day: day,
         id: todoList.length + 1,
+        finished: false,
       };
-      const list = [...todoList];
+      let list = [...todoList];
       list.push(newTodoItem);
       setTodoList(list);
     }
+  };
+
+  const deleteItem = ({ index }) => {
+    const newTodoList = todoList.slice();
+    newTodoList.splice(index, 1);
+    setTodoList(newTodoList);
+  };
+
+  const finishedOrNot = ({ index }) => {
+    const newTodoList = todoList.slice();
+    newTodoList[index].finished = !newTodoList[index].finished;
+    setTodoList(newTodoList);
+  };
+
+  const sortByTime = () => {
+    todoList.sort((a, b) => {
+      let aMonth = parseInt(a.month);
+      let bMonth = parseInt(b.month);
+      let aDay = parseInt(a.day);
+      let bDay = parseInt(b.day);
+      return aMonth - bMonth || aDay - bDay;
+    });
+    setTodoList([...todoList]);
   };
 
   return (
@@ -67,7 +92,19 @@ const App = () => {
         ></input>
         <button onClick={addItem}>Add</button>
       </div>
-      <TodoList items={todoList} />
+      <button type="submit" onClick={() => sortByTime()}>
+        Sort By Time
+      </button>
+      <ul className="todo-list">
+        {todoList.map((item, index) => (
+          <TodoItem
+            key={index}
+            item={item}
+            toggle={() => finishedOrNot({ index })}
+            remove={() => deleteItem({ index })}
+          />
+        ))}
+      </ul>
     </div>
   );
 };
