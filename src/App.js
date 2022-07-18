@@ -1,56 +1,64 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import TodoItem from "./components/todo-item/todoItem.component";
 import "./App.css";
+import axios from "axios";
 
 const App = () => {
   const [todoList, setTodoList] = useState([]);
-  const [todoText, setTodoText] = useState("");
-  const [month, setMonth] = useState("");
-  const [day, setDay] = useState("");
+  const todoText = useRef(null);
+  const month = useRef(null);
+  const day = useRef(null);
 
-  const addText = (event) => {
-    // console.log("value", event.target.value);
-    const newTodo = event.target.value;
-    setTodoText(newTodo);
+  useEffect(() => {
+    axios.get("http://localhost:8080/todos").then((response) => {
+      // console.log(response.data.data);
+      setTodoList(response.data.data);
+    });
+  }, []);
+
+  const addTodo = () => {
+    let text = todoText.current.value;
+    let todoMonth = month.current.value;
+    let todoDay = day.current.value;
+    axios
+      .post("http://localhost:8080/todos", {
+        todoText: text,
+        month: todoMonth,
+        day: todoDay,
+        finished: 0,
+      })
+      .then((response) => {
+        setTodoList(response.data.data);
+      })
+      .then(() => {
+        alert("Add insert succeed!");
+      });
+    todoText.current.value = "";
+    month.current.value = "";
+    day.current.value = "";
   };
 
-  const addMonth = (event) => {
-    const newMonth = event.target.value + "";
-    setMonth(newMonth);
-  };
-  const addDay = (event) => {
-    const newDay = event.target.value + "";
-    setDay(newDay);
-  };
-
-  const addItem = () => {
-    if (todoText === "" || month === "" || day === "") {
-      alert("请输入内容");
-    } else {
-      const newTodoItem = {
-        todoText: todoText,
-        month: month,
-        day: day,
-        id: todoList.length + 1,
-        finished: false,
-      };
-      let list = [...todoList];
-      list.push(newTodoItem);
-      setTodoList(list);
-    }
+  const changeState = (id) => {
+    axios
+      .put(`${"http://localhost:8080/todos"}/${id}`)
+      .then((response) => {
+        setTodoList(response.data.data);
+      })
+      .then(() => {
+        alert("Toggle update succeed!");
+      });
   };
 
-  const deleteItem = ({ index }) => {
-    const newTodoList = todoList.slice();
-    newTodoList.splice(index, 1);
-    setTodoList(newTodoList);
-  };
-
-  const finishedOrNot = ({ index }) => {
-    const newTodoList = todoList.slice();
-    newTodoList[index].finished = !newTodoList[index].finished;
-    setTodoList(newTodoList);
+  const deleteTodo = (id) => {
+    axios
+      .delete(`${"http://localhost:8080/todos"}/${id}`)
+      .then((response) => {
+        setTodoList(response.data.data);
+      })
+      .then(() => {
+        alert("Deleted remove succeed!");
+      });
   };
 
   const sortByTime = () => {
@@ -74,34 +82,34 @@ const App = () => {
           type="text"
           maxLength="30"
           placeholder="E.g. Feed the cat"
-          onChange={addText}
+          ref={todoText}
         ></input>
         <input
           name="month"
           placeholder="m"
-          onChange={addMonth}
+          ref={month}
           type="text"
           maxLength="2"
         ></input>
         <input
           name="day"
           placeholder="d"
-          onChange={addDay}
+          ref={day}
           type="text"
           maxLength="2"
         ></input>
-        <button onClick={addItem}>Add</button>
+        <button onClick={addTodo}>Add</button>
       </div>
       <button type="submit" onClick={() => sortByTime()}>
         Sort By Time
       </button>
       <ul className="todo-list">
-        {todoList.map((item, index) => (
+        {todoList.map((item) => (
           <TodoItem
-            key={index}
+            key={item.id}
             item={item}
-            toggle={() => finishedOrNot({ index })}
-            remove={() => deleteItem({ index })}
+            toggle={() => changeState(item.id)}
+            remove={() => deleteTodo(item.id)}
           />
         ))}
       </ul>

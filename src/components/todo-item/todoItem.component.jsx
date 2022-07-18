@@ -5,7 +5,9 @@ const TodoItem = ({ item, toggle, remove }) => {
     <div className="todo-item">
       <li
         className="item-content"
-        style={{ textDecoration: item.finished ? "line-through" : "none" }}
+        style={{
+          textDecoration: item.finished !== 0 ? "line-through" : "none",
+        }}
       >
         <p>{todoText}</p>
         <span>
