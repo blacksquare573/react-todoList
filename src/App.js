@@ -29,6 +29,7 @@ const App = () => {
         finished: 0,
       })
       .then((response) => {
+        console.log(response.data.data);
         setTodoList(response.data.data);
       })
       .then(() => {
