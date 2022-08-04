@@ -8,6 +8,6 @@ test("renders correctly", () => {
     email: "qq1111@gmail.com",
   };
 
-  const tree = renderer.create(<Card monster={mockMonster} />).toJSON();
-  expect(tree).toMatchSnapshot();
+  const testCard = renderer.create(<Card monster={mockMonster} />).toJSON();
+  expect(testCard).toMatchSnapshot();
 });
